@@ -4,11 +4,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+
 public class Position {
+    //initialized by the    constructor:
     private int[] matchsticksInRows = new int[4];
     private Rating rating;
 
+    //only for caching calculation results:
     private int ratingIsVisibleAbove;
+    private int complexity;
+    private int[] matchsticksInRowsAsc;
+
+    /******************************
+    * Constructor, simple getters *
+     ******************************/
 
     public Position(int firstRow, int secondRow, int thirdRow, int fourthRow) {
         this.matchsticksInRows[0] = firstRow;
@@ -16,11 +25,11 @@ public class Position {
         this.matchsticksInRows[2] = thirdRow;
         this.matchsticksInRows[3] = fourthRow;
         this.rating = Rating.UNKNOWN;
-        this.ratingIsVisibleAbove = 0; //default all visible
+
     }
 
     public int[] getMatchsticksInRows() {
-        int[] result = new int[4];
+        int[] result;
         result = Arrays.copyOfRange(matchsticksInRows,0,4);
         return result;
     }
@@ -29,39 +38,88 @@ public class Position {
         return rating;
     }
 
+    /*********
+    * Setter *
+     *********/
     public void setRating(Rating rating){
         this.rating = rating;
     }
 
-    public int getMatchsticksInRow(int row){
-        return(matchsticksInRows[row]);
+     /**********************
+     * Some simple methods *
+     ***********************/
+     public int getMatchsticksInRow(int row){
+         return(matchsticksInRows[row]);
+     }
+
+     public boolean isSamePosition(Position askedPosition){
+         for (int i=0;i<4;i++){
+             if (this.getMatchsticksInRow(i) != askedPosition.getMatchsticksInRow(i)){
+                 return false;
+             }
+         }
+         return true;
+     }
+
+    public boolean isEquivalentPosition(Position askedPosition){
+        for (int i=0;i<4;i++){
+            if (this.getMatchsticksInRowsAsc()[i] != askedPosition.getMatchsticksInRowsAsc()[i]){
+                return false;
+            }
+        }
+        return true;
     }
 
-    public int[] getPositionOrdered(){
-        int[] result = new int[4];
-        result = Arrays.copyOfRange(matchsticksInRows,0,4);
-        result = orderRowsAsc(result);
+
+    /*************************************************************
+    * Get and set matchsticks in 1st-4th rows in ascending order *
+     *************************************************************/
+    public int[] getMatchsticksInRowsAsc(){
+        if (matchsticksInRowsAsc == null){
+            setMatchsticksInRowsAsc();
+        }
+        int[] result;
+        result = Arrays.copyOfRange(matchsticksInRowsAsc,0,4);
         return result;
     }
 
-    public boolean isEquivalent(int[] askedPosition){
-        if (askedPosition.length != 4){
-            return false;
-        }
-        boolean equals = Arrays.equals(getPositionOrdered(), orderRowsAsc(askedPosition));
-        return equals;
+    private void setMatchsticksInRowsAsc(){
+        this.matchsticksInRowsAsc = Arrays.copyOfRange(matchsticksInRows,0,4);
+        Arrays.sort(matchsticksInRowsAsc);
     }
+
+
+     /*************************
+     * Get and set complexity *
+      *************************/
+     private int howMuchDifficult(){
+         return (matchsticksInRows[0]+1)*(matchsticksInRows[1]+1)*(matchsticksInRows[2]+1)*(matchsticksInRows[3]+1);
+     }
+
+     public int getComplexity(){
+         if (this.complexity == 0){              //=>not initialized yet
+            this.complexity = howMuchDifficult();
+         }
+         return this.complexity;
+     }
+
+    /***********************************
+    * Get and set ratingIsVisibleAbove *
+     ***********************************/
+    //ratingIsVisibleAbove = the computer's AI can use this knowledge from this level
 
     public int getRatingIsVisibleAbove(){
+        if (this.ratingIsVisibleAbove == 0){  //=> not initialized yet
+            setVisible();
+        }
         return this.ratingIsVisibleAbove;
     }
-
-    public void setVisible(){
-        if (isEquivalent(new int[]{1,1,1,0})){
-                this.ratingIsVisibleAbove = 1;
-                return;
+    private void setVisible(){
+        if (isEquivalentPosition(new Position(1,1,1,0))){
+            this.ratingIsVisibleAbove = 1;
+            return;
         }
-        if (isEquivalent(new int[] {2,2,0,0})){
+        if (isEquivalentPosition(new Position(2,2,0,0))){
             this.ratingIsVisibleAbove = 2;
             return;
         }
@@ -77,7 +135,7 @@ public class Position {
             this.ratingIsVisibleAbove = 4;
             return;
         }
-        if (isEquivalent(new int[]{0,1,2,3})){
+        if (isEquivalentPosition(new Position(0,1,2,3))){
             this.ratingIsVisibleAbove = 5;
             return;
         }
@@ -86,59 +144,11 @@ public class Position {
             return;
         }
         this.ratingIsVisibleAbove = 7;
-        return;
-
     }
 
-    public List<int[]> getPossibleNextPositions(){
-        int[] nextPosition;
-        List<int[]> result = new ArrayList<>();
-        if (matchsticksInRows[0] > 0){
-            for (int i=0;i<matchsticksInRows[0];i++){
-                nextPosition = new int[4];
-                nextPosition[0] = i;
-                nextPosition[1] = matchsticksInRows[1];
-                nextPosition[2] = matchsticksInRows[2];
-                nextPosition[3] = matchsticksInRows[3];
-                result.add(nextPosition);
-            }
-        }
-
-        if (matchsticksInRows[1] > 0){
-            for (int i=0;i<matchsticksInRows[1];i++){
-                nextPosition = new int[4];
-                nextPosition[0] = matchsticksInRows[0];
-                nextPosition[1] = i;
-                nextPosition[2] = matchsticksInRows[2];
-                nextPosition[3] = matchsticksInRows[3];
-                result.add(nextPosition);
-            }
-        }
-
-        if (matchsticksInRows[2] > 0){
-            for (int i=0;i<matchsticksInRows[2];i++){
-                nextPosition = new int[4];
-                nextPosition[0] = matchsticksInRows[0];
-                nextPosition[1] = matchsticksInRows[1];
-                nextPosition[2] = i;
-                nextPosition[3] = matchsticksInRows[3];
-                result.add(nextPosition);
-            }
-        }
-
-        if (matchsticksInRows[3] > 0){
-            for (int i=0;i<matchsticksInRows[3];i++){
-                nextPosition = new int[4];
-                nextPosition[0] = matchsticksInRows[0];
-                nextPosition[1] = matchsticksInRows[1];
-                nextPosition[2] = matchsticksInRows[2];
-                nextPosition[3] = i;
-                result.add(nextPosition);
-            }
-        }
-        return result;
-    }
-
+    /*********************************
+    * private methods for setVisible *
+     *********************************/
     private int getMaxMatchStickInRow(){
         int result = 0;
         for (int actual :matchsticksInRows) {
@@ -177,14 +187,75 @@ public class Position {
         return result;
     }
 
+    /*************************************************************
+    * Get List about possible next positions (evolved from this) *
+    **************************************************************/
+    public List<Position> getPossibleNextPositions(){
+        Position nextPosition;
+        int[] nextMatchsticksInRows = new int[4];
+        List<Position> result = new ArrayList<>();
+        if (matchsticksInRows[0] > 0){
+            for (int i=0;i<matchsticksInRows[0];i++){
+                nextMatchsticksInRows[0] = i;
+                nextMatchsticksInRows[1] = matchsticksInRows[1];
+                nextMatchsticksInRows[2] = matchsticksInRows[2];
+                nextMatchsticksInRows[3] = matchsticksInRows[3];
 
-    public int[] orderRowsAsc(int[] input){
-        int[] result = new int[4];
-        for (int i=0;i<4;i++){
-            result[i] = input[i];
+                nextPosition = new Position(nextMatchsticksInRows[0],
+                        nextMatchsticksInRows[1],
+                        nextMatchsticksInRows[2],
+                        nextMatchsticksInRows[3]);
+                result.add(nextPosition);
+            }
         }
-        Arrays.sort(result);
 
+        if (matchsticksInRows[1] > 0){
+            for (int i=0;i<matchsticksInRows[1];i++){
+
+                nextMatchsticksInRows[0] = matchsticksInRows[0];
+                nextMatchsticksInRows[1] = i;
+                nextMatchsticksInRows[2] = matchsticksInRows[2];
+                nextMatchsticksInRows[3] = matchsticksInRows[3];
+
+                nextPosition = new Position(nextMatchsticksInRows[0],
+                        nextMatchsticksInRows[1],
+                        nextMatchsticksInRows[2],
+                        nextMatchsticksInRows[3]);
+                result.add(nextPosition);
+            }
+        }
+
+        if (matchsticksInRows[2] > 0){
+            for (int i=0;i<matchsticksInRows[2];i++){
+
+                nextMatchsticksInRows[0] = matchsticksInRows[0];
+                nextMatchsticksInRows[1] = matchsticksInRows[1];
+                nextMatchsticksInRows[2] = i;
+                nextMatchsticksInRows[3] = matchsticksInRows[3];
+
+                nextPosition = new Position(nextMatchsticksInRows[0],
+                        nextMatchsticksInRows[1],
+                        nextMatchsticksInRows[2],
+                        nextMatchsticksInRows[3]);
+                result.add(nextPosition);
+            }
+        }
+
+        if (matchsticksInRows[3] > 0){
+            for (int i=0;i<matchsticksInRows[3];i++){
+
+                nextMatchsticksInRows[0] = matchsticksInRows[0];
+                nextMatchsticksInRows[1] = matchsticksInRows[1];
+                nextMatchsticksInRows[2] = matchsticksInRows[2];
+                nextMatchsticksInRows[3] = i;
+
+                nextPosition = new Position(nextMatchsticksInRows[0],
+                        nextMatchsticksInRows[1],
+                        nextMatchsticksInRows[2],
+                        nextMatchsticksInRows[3]);
+                result.add(nextPosition);
+            }
+        }
         return result;
     }
 }

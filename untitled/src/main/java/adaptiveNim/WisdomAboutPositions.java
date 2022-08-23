@@ -12,14 +12,16 @@ public class WisdomAboutPositions {
         populateAllPositions();
         //setPositionLooser(new int[]{0,0,0,0}); //the looser take the last matchstick, and leaves this position on the table
         ratePositions();
+
     }
 
-    public boolean isWinner(int[] thisFour){
+
+    public boolean isWinner(Position askedPosition){
         boolean actualListItemIsWinner;
         boolean positionsAreEquivalent;
         for (Position actualListItem: allPositions) {
             actualListItemIsWinner = (actualListItem.getRating() == Rating.VINNER);
-            positionsAreEquivalent = actualListItem.isEquivalent(thisFour);
+            positionsAreEquivalent = actualListItem.isEquivalentPosition(askedPosition);
             if (actualListItemIsWinner && positionsAreEquivalent){
                 return true;
             }
@@ -27,12 +29,27 @@ public class WisdomAboutPositions {
         return false;
     }
 
-    public boolean isLooser(int[] thisFour){
+    public boolean isVisibleWinner(int[] thisFour, int level){
+        boolean actualListItemIsWinner;
+        boolean actualListItemIsVisible;
+        boolean positionsAreSame;
+        for (Position actualListItem: allPositions) {
+            actualListItemIsWinner = (actualListItem.getRating() == Rating.VINNER);
+            actualListItemIsVisible = (actualListItem.getRatingIsVisibleAbove() <= level);
+            positionsAreSame = Arrays.equals(thisFour, actualListItem.getMatchsticksInRows());
+            if (actualListItemIsWinner && actualListItemIsVisible && positionsAreSame){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isLooser(Position askedPosition){
         boolean actualListItemIsLooser;
         boolean positionsAreEquivalent;
         for (Position actualListItem: allPositions) {
             actualListItemIsLooser = (actualListItem.getRating() == Rating.LOOSER);
-            positionsAreEquivalent = actualListItem.isEquivalent(thisFour);
+            positionsAreEquivalent = actualListItem.isEquivalentPosition(askedPosition);
             if (actualListItemIsLooser && positionsAreEquivalent){
                 return true;
             }
@@ -81,6 +98,20 @@ public class WisdomAboutPositions {
         }
     }
 
+    public Position suggestNextStep(int gameLevel, int[] actualPosition){
+        Position actual = new Position(actualPosition[0], actualPosition[1],
+                                        actualPosition[2], actualPosition[3]);
+        List<Position> possibleSteps = actual.getPossibleNextPositions();
+        for (Position isItMaybe: possibleSteps){
+            if (isVisibleWinner(isItMaybe.getMatchsticksInRows(),gameLevel)){
+                return isItMaybe;
+            }
+        }
+        //Plan: if winner mot found, choose the most difficult:
+        //temporary: choose the first
+        return possibleSteps.get(0);
+    }
+
 
     private void populateAllPositions(){
         for (int i=0;i<=MAX_OF_ROWS[0];i++){
@@ -96,8 +127,8 @@ public class WisdomAboutPositions {
     }
 
     private void ratePositions(){
-        setPositionLooser(new int[]{0,0,0,0}); //the looser take the last matchstick, and leaves this position on the table
-        List<int[]> winnerCanditateAllNextPositions;
+        setPositionLooser(new Position(0,0,0,0)); //the looser take the last matchstick, and leaves this position on the table
+        List<Position> winnerCanditateAllNextPositions;
         for (int i=0;i<allPositions.size();i++){
             if (allPositions.get(i).getRating() == Rating.UNKNOWN){ //checking UNKNOWN if they are winner
                 winnerCanditateAllNextPositions = allPositions.get(i).getPossibleNextPositions();
@@ -116,7 +147,7 @@ public class WisdomAboutPositions {
         List<int[]> loosers = new ArrayList<>();
         loosers = getPossiblePreviousPosition(winnerFour);
         for (int[] actual:loosers) {
-            setPositionLooser(actual);
+            setPositionLooser(new Position(actual[0], actual[1], actual[2], actual[3]));
         }
     }
 
@@ -180,9 +211,9 @@ public class WisdomAboutPositions {
         return result;
     }
 
-    private boolean allOfTheseAreLooser(List<int[]> listForCheck){
+    private boolean allOfTheseAreLooser(List<Position> listForCheck){
         boolean actualNotLooser;
-        for (int[] actual:listForCheck){
+        for (Position actual:listForCheck){
             actualNotLooser = !isLooser(actual);
             if (actualNotLooser){
                 return false;
@@ -191,17 +222,17 @@ public class WisdomAboutPositions {
         return true;
     }
 
-    private void setPositionWinner(int[] positionToSet){
+    private void setPositionWinner(Position positionToSet){
         for (Position actual:allPositions){
-            if (actual.isEquivalent(positionToSet)){
+            if (actual.isEquivalentPosition(positionToSet)){
                 actual.setRating(Rating.VINNER);
             }
         }
     }
 
-    private void setPositionLooser(int[] positionToSet){
+    private void setPositionLooser(Position positionToSet){
         for (Position actual:allPositions){
-            if (actual.isEquivalent(positionToSet)){
+            if (actual.isEquivalentPosition(positionToSet)){
                 actual.setRating(Rating.LOOSER);
             }
         }
