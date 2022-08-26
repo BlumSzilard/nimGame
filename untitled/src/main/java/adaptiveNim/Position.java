@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Position {
     //initialized by the    constructor:
-    private int[] matchsticksInRows = new int[4];
+    private final int[] matchsticksInRows = new int[4];
     private Rating rating;
 
     //only for caching calculation results:
@@ -70,6 +70,36 @@ public class Position {
         return true;
     }
 
+    public void print() {
+        StringBuilder toPrint = new StringBuilder();
+        int matchsticks;
+        for (int i = 0; i < 4; i++) {
+            matchsticks = getMatchsticksInRow(i);
+            toPrint.append(toSerial(i));
+
+            for (int j = 0; j < (4 - matchsticks/2); j++) {
+                toPrint.append(' ');
+            }
+
+            for (int j = 0; j < matchsticks; j++) {
+                toPrint.append('|');
+            }
+
+            toPrint.append('\n');
+        }
+        System.out.println(toPrint);
+     }
+
+     private String toSerial(int number){
+        switch (number){
+            case 0: return "1st row:";
+            case 1: return "2nd row:";
+            case 2: return "3rd row:";
+            case 3: return "4th row:";
+            default: return "error";
+        }
+     }
+
 
     /*************************************************************
     * Get and set matchsticks in 1st-4th rows in ascending order *
@@ -106,7 +136,7 @@ public class Position {
     /***********************************
     * Get and set ratingIsVisibleAbove *
      ***********************************/
-    //ratingIsVisibleAbove = the computer's AI can use this knowledge from this level
+    //ratingIsVisibleAbove = the computer's AI can use this knowledge above this level
 
     public int getRatingIsVisibleAbove(){
         if (this.ratingIsVisibleAbove == 0){  //=> not initialized yet
@@ -115,12 +145,17 @@ public class Position {
         return this.ratingIsVisibleAbove;
     }
     private void setVisible(){
-        if (isEquivalentPosition(new Position(1,1,1,0))){
+        if (isEquivalentPosition(new Position(1,0,0,0))){
             this.ratingIsVisibleAbove = 1;
             return;
         }
-        if (isEquivalentPosition(new Position(2,2,0,0))){
+
+        if (isEquivalentPosition(new Position(1,1,1,0))){
             this.ratingIsVisibleAbove = 2;
+            return;
+        }
+        if (isEquivalentPosition(new Position(2,2,0,0))){
+            this.ratingIsVisibleAbove = 3;
             return;
         }
         int nonNullRows = getNonNullRows();
@@ -128,22 +163,22 @@ public class Position {
         int maxMatchsticks = getMaxMatchStickInRow();
 
         if (nonNullRows == 2 && (totalMatchsticks/2) == maxMatchsticks){ //x-x-0-0
-            this.ratingIsVisibleAbove = 3;
-            return;
-        }
-        if (nonNullRows == 4 && ((totalMatchsticks-2)/2) == maxMatchsticks && countOneStickRows() == 2){       //x-x-1-1
             this.ratingIsVisibleAbove = 4;
             return;
         }
-        if (isEquivalentPosition(new Position(0,1,2,3))){
+        if (nonNullRows == 4 && ((totalMatchsticks-2)/2) == maxMatchsticks && countOneStickRows() == 2){       //x-x-1-1
             this.ratingIsVisibleAbove = 5;
             return;
         }
-        if (totalMatchsticks <= 16){ //all other position evolving from original (1-3-5-7) position
+        if (isEquivalentPosition(new Position(0,1,2,3))){
             this.ratingIsVisibleAbove = 6;
             return;
         }
-        this.ratingIsVisibleAbove = 7;
+        if (totalMatchsticks <= 16){ //all other position evolving from original (1-3-5-7) position
+            this.ratingIsVisibleAbove = 7;
+            return;
+        }
+        this.ratingIsVisibleAbove = 8;
     }
 
     /*********************************

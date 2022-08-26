@@ -118,77 +118,98 @@ class PositionTest {
     }
 
     @org.junit.jupiter.api.Test
-    void testSetLevel1and2(){
+    void testSetLevel2and3(){
         position = new Position(1,1,1,0);
         position.setRating(Rating.VINNER);
 
-        assertEquals(1, position.getRatingIsVisibleAbove());
+        assertEquals(2, position.getRatingIsVisibleAbove());
 
         position = new Position(0,1,1,1);
         position.setRating(Rating.VINNER);
 
-        assertEquals(1, position.getRatingIsVisibleAbove());
+        assertEquals(2, position.getRatingIsVisibleAbove());
 
         position = new Position(1,1,0,1);
         position.setRating(Rating.VINNER);
 
-        assertEquals(1, position.getRatingIsVisibleAbove());
+        assertEquals(2, position.getRatingIsVisibleAbove());
 
         position = new Position(2,2,0,0);
         position.setRating(Rating.VINNER);
 
-        assertEquals(2, position.getRatingIsVisibleAbove());
+        assertEquals(3, position.getRatingIsVisibleAbove());
 
         position = new Position(0,2,0,2);
         position.setRating(Rating.VINNER);
 
-        assertEquals(2, position.getRatingIsVisibleAbove());
+        assertEquals(3, position.getRatingIsVisibleAbove());
     }
     @org.junit.jupiter.api.Test
-    void testSetLevel3and4(){
+    void testSetLevel4and5(){
         position = new Position(3,3,0,0);
         position.setRating(Rating.VINNER);
 
-        assertEquals(3, position.getRatingIsVisibleAbove());
+        assertEquals(4, position.getRatingIsVisibleAbove());
 
         position = new Position(5,0,0,5);
         position.setRating(Rating.VINNER);
 
-        assertEquals(3, position.getRatingIsVisibleAbove());
+        assertEquals(4, position.getRatingIsVisibleAbove());
 
         position = new Position(0,6,0,6);
         position.setRating(Rating.VINNER);
 
-        assertEquals(3, position.getRatingIsVisibleAbove());
+        assertEquals(4, position.getRatingIsVisibleAbove());
 
         position = new Position(1,6,1,6);
         position.setRating(Rating.VINNER);
 
-        assertEquals(4, position.getRatingIsVisibleAbove());
+        assertEquals(5, position.getRatingIsVisibleAbove());
 
         position = new Position(1,7,1,7);
         position.setRating(Rating.VINNER);
 
-        assertEquals(4, position.getRatingIsVisibleAbove());
+        assertEquals(5, position.getRatingIsVisibleAbove());
     }
 
     @org.junit.jupiter.api.Test
-    void testSetLevel5_6and7(){
+    void testSetLevel6_7and8(){
         position = new Position(1,3,0,2);
-        position.setRating(Rating.VINNER);
-
-        assertEquals(5, position.getRatingIsVisibleAbove());
-
-        position = new Position(1,6,4,3);
         position.setRating(Rating.VINNER);
 
         assertEquals(6, position.getRatingIsVisibleAbove());
 
-        position = new Position(6,5,5,6);
+        position = new Position(1,6,4,3);
         position.setRating(Rating.VINNER);
 
         assertEquals(7, position.getRatingIsVisibleAbove());
 
+        position = new Position(6,5,5,6);
+        position.setRating(Rating.VINNER);
 
+        assertEquals(8, position.getRatingIsVisibleAbove());
     }
+
+    @org.junit.jupiter.api.Test
+    void testGetComplexity(){
+        position = new Position(1,3,0,2);
+        assertEquals(24,position.getComplexity());
+        assertEquals(24,position.getComplexity()); //testing if cached
+
+        position = new Position(0,0,0,0);
+        assertEquals(1,position.getComplexity());
+
+        position = new Position(5,5,5,5);
+        assertEquals(1296,position.getComplexity());
+    }
+
+    @org.junit.jupiter.api.Test
+    void testIsSamePosition(){
+        position = new Position(1,3,0,2);
+        Position samePosition = new Position(1,3,0,2);
+        Position onlyEquivalentPosition = new Position(0,1,2,3);
+        assertTrue(position.isSamePosition(samePosition));
+        assertFalse(position.isSamePosition(onlyEquivalentPosition));
+    }
+
 }
