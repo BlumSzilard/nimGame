@@ -56,7 +56,8 @@ public class Status {
     }
 
     public void print(){
-        System.out.printf("Round:%d    wins/total:%d/%d    level:d%",this.roundCounter,this.userReachedWins,
+        System.out.printf("Round:%d    wins/total:%d|%d    level:%d",this.roundCounter,this.userReachedWins,
                                                                 this.roundCounter,this.userReachedLevel);
+        System.out.println();
     }
 }

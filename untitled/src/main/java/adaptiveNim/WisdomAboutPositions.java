@@ -171,10 +171,9 @@ public class WisdomAboutPositions {
         return false;
     }
 
-    public Position suggestNextStep(int gameLevel, int[] actualPosition){
-        Position actual = new Position(actualPosition[0], actualPosition[1],
-                                        actualPosition[2], actualPosition[3]);
-        List<Position> possibleSteps = actual.getPossibleNextPositions();
+    public Position suggestNextStep(int gameLevel, Position actualPosition){
+
+        List<Position> possibleSteps = actualPosition.getPossibleNextPositions();
         for (Position isItMaybe: possibleSteps){
             if (isVisibleWinner(isItMaybe.getMatchsticksInRows(),gameLevel)){
                 return isItMaybe;
