@@ -113,13 +113,40 @@ public class NimMain {
 
     private Position askUserForNextPosition(Position actualPosition){
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Type your choice row:");
-        //scanner.useDelimiter(":");
-        int row = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Type your choice matchsticks number:");
-        int pieces = scanner.nextInt();
-        scanner.nextLine();
+        String answer;
+        boolean inputNotOk = true;
+        int row = 666;
+        int pieces = 666;
+
+        do {
+            System.out.println("Type your choice (row:matchsticks):");
+            answer = scanner.nextLine();
+            boolean answerFormatIncorrect = false;
+            boolean answerNumbersIncorrect = false;
+            answerFormatIncorrect = answerFormatIncorrect ||  (answer.length() != 3);
+            answerFormatIncorrect = answerFormatIncorrect ||  (!answer.contains(":"));
+            answerFormatIncorrect = answerFormatIncorrect || (!Character.isDigit(answer.toCharArray()[0]));
+            answerFormatIncorrect = answerFormatIncorrect || (!Character.isDigit(answer.toCharArray()[2]));
+
+            if (answerFormatIncorrect){
+                printRulesOfCommunication();
+            } else {
+                 row = Character.getNumericValue(answer.toCharArray()[0]);
+                 pieces = Character.getNumericValue(answer.toCharArray()[2]);
+
+                 answerNumbersIncorrect = answerNumbersIncorrect || (row < 1);
+                 answerNumbersIncorrect = answerNumbersIncorrect || (row > 4);
+                 answerNumbersIncorrect = answerNumbersIncorrect || (pieces < 1);
+                 answerNumbersIncorrect = answerNumbersIncorrect || (pieces > actualPosition.getMatchsticksInRow(row-1));
+
+                 if (answerNumbersIncorrect){
+                     printRulesOfCommunication();
+                 } else {
+                     inputNotOk = false;
+                 }
+            }
+        } while (inputNotOk);
+
         int[] next = new int[4];
         for (int i=0;i<4; i++){
                 next[i] = actualPosition.getMatchsticksInRow(i);
@@ -127,5 +154,11 @@ public class NimMain {
         next[row-1] = next[row-1] - pieces;
         Position result = new Position(next[0],next[1],next[2],next[3]);
         return result;
+    }
+
+    private void printRulesOfCommunication(){
+        System.out.println("Input format must be: 'a:b' ");
+        System.out.println("'a' is the row number (valid: 1-4)");
+        System.out.println("'b' is the number of matchstick do you want to get (valid: 1-all of that row) ");
     }
 }

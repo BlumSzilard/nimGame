@@ -38,6 +38,9 @@ public class Status {
     public void userWins(){
         if (computerActualLevel > userReachedLevel) {
             userReachedLevel = computerActualLevel;
+            System.out.println("********************************");
+            System.out.println("* You achieved the next level! *");
+            System.out.println("********************************");
         }
         roundCounter++;
         userReachedWins++;
@@ -57,7 +60,7 @@ public class Status {
 
     public void print(){
         System.out.printf("Round:%d    wins/total:%d|%d    level:%d",this.roundCounter,this.userReachedWins,
-                                                                this.roundCounter,this.userReachedLevel);
+                (this.roundCounter-1),this.userReachedLevel);
         System.out.println();
     }
 }
