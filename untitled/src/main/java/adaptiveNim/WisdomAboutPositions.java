@@ -3,6 +3,7 @@ package adaptiveNim;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class WisdomAboutPositions {
     private List<Position> allPossiblePositions = new ArrayList<>();
@@ -179,9 +180,24 @@ public class WisdomAboutPositions {
                 return isItMaybe;
             }
         }
-        //Plan: if winner mot found, choose the most difficult:
-        //temporary: choose the first
-        return possibleSteps.get(0);
+        if (gameLevel<2){ //at first game level: choose the first, if no idea
+            return possibleSteps.get(0);
+        }
+        if (gameLevel==2){ //at second game level: choose random, if no idea
+            Random random = new Random();
+            int randomIndex = random.nextInt(possibleSteps.size());
+            return possibleSteps.get(randomIndex);
+        }
+        //above level 3: choose the most difficult, if no idea
+        int topDifficultValue = 0;
+        int topDifficultStepIndex = 0;
+        for (int i=0;i<possibleSteps.size();i++){
+            if (possibleSteps.get(i).getComplexity()>topDifficultValue){
+                topDifficultValue = possibleSteps.get(i).getComplexity();
+                topDifficultStepIndex = i;
+            }
+        }
+        return possibleSteps.get(topDifficultStepIndex);
     }
 
 
