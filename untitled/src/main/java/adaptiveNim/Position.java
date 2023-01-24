@@ -10,8 +10,8 @@ public class Position {
     private final int[] matchsticksInRows = new int[4];
     private Rating rating;
 
-    //only for caching calculation results:
-    private int ratingIsVisibleAbove;
+    //only for caching method's calculation results:
+    private int visibleAboveLevel;
     private int complexity;
     private int[] matchsticksInRowsAsc;
 
@@ -25,7 +25,6 @@ public class Position {
         this.matchsticksInRows[2] = thirdRow;
         this.matchsticksInRows[3] = fourthRow;
         this.rating = Rating.UNKNOWN;
-
     }
 
     public int[] getMatchsticksInRows() {
@@ -52,16 +51,7 @@ public class Position {
          return(matchsticksInRows[row]);
      }
 
-     public boolean isSamePosition(Position askedPosition){
-         for (int i=0;i<4;i++){
-             if (this.getMatchsticksInRow(i) != askedPosition.getMatchsticksInRow(i)){
-                 return false;
-             }
-         }
-         return true;
-     }
-
-    public boolean isEquivalentPosition(Position askedPosition){
+     public boolean isEquivalentPosition(Position askedPosition){
         for (int i=0;i<4;i++){
             if (this.getMatchsticksInRowsAsc()[i] != askedPosition.getMatchsticksInRowsAsc()[i]){
                 return false;
@@ -102,7 +92,7 @@ public class Position {
 
 
     /*************************************************************
-    * Get and set matchsticks in 1st-4th rows in ascending order *
+    * Get copy of matchsticks in 1st-4th rows in ascending order *
      *************************************************************/
     public int[] getMatchsticksInRowsAsc(){
         if (matchsticksInRowsAsc == null){
@@ -133,29 +123,29 @@ public class Position {
          return this.complexity;
      }
 
-    /***********************************
-    * Get and set ratingIsVisibleAbove *
-     ***********************************/
-    //ratingIsVisibleAbove = the computer's AI can use this knowledge above this level
+    /*****************************************
+    * Get and set positonIsVisibleAboveLevel *
+     *****************************************/
+    //positionIsVisibleAboveLevel = the computer's AI can use this knowledge above this level
 
-    public int getRatingIsVisibleAbove(){
-        if (this.ratingIsVisibleAbove == 0){  //=> not initialized yet
+    public int getVisibleAboveLevel(){
+        if (this.visibleAboveLevel == 0){  //=> not initialized yet
             setVisible();
         }
-        return this.ratingIsVisibleAbove;
+        return this.visibleAboveLevel;
     }
     private void setVisible(){
         if (isEquivalentPosition(new Position(1,0,0,0))){
-            this.ratingIsVisibleAbove = 1;
+            this.visibleAboveLevel = 1;
             return;
         }
 
         if (isEquivalentPosition(new Position(1,1,1,0))){
-            this.ratingIsVisibleAbove = 2;
+            this.visibleAboveLevel = 2;
             return;
         }
         if (isEquivalentPosition(new Position(2,2,0,0))){
-            this.ratingIsVisibleAbove = 3;
+            this.visibleAboveLevel = 3;
             return;
         }
         int nonNullRows = getNonNullRows();
@@ -163,22 +153,22 @@ public class Position {
         int maxMatchsticks = getMaxMatchStickInRow();
 
         if (nonNullRows == 2 && (totalMatchsticks/2) == maxMatchsticks){ //x-x-0-0
-            this.ratingIsVisibleAbove = 4;
+            this.visibleAboveLevel = 4;
             return;
         }
         if (nonNullRows == 4 && ((totalMatchsticks-2)/2) == maxMatchsticks && countOneStickRows() == 2){       //x-x-1-1
-            this.ratingIsVisibleAbove = 5;
+            this.visibleAboveLevel = 5;
             return;
         }
         if (isEquivalentPosition(new Position(0,1,2,3))){
-            this.ratingIsVisibleAbove = 6;
+            this.visibleAboveLevel = 6;
             return;
         }
         if (totalMatchsticks <= 16){ //all other position evolving from original (1-3-5-7) position
-            this.ratingIsVisibleAbove = 7;
+            this.visibleAboveLevel = 7;
             return;
         }
-        this.ratingIsVisibleAbove = 8;
+        this.visibleAboveLevel = 8;
     }
 
     /*********************************

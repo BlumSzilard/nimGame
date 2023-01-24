@@ -1,5 +1,5 @@
 package adaptiveNim;
 
 public enum Rating {
-    VINNER, LOOSER, UNKNOWN;
+    WINNER, LOOSER, UNKNOWN
 }
